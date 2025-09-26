@@ -2,7 +2,6 @@ const moment = require('moment');
 const express = require('express');
 const fs = require('fs')
 const path = require('path');
-const { json } = require('stream/consumers');
 
 const pathToJson = path.join(__dirname, 'posts.json')
 
