@@ -1,13 +1,14 @@
 const moment = require('moment');
 const express = require('express');
-const fs = require('fs')
+const fs = require('fs');
+const fsp = require('fs/promises');
 const path = require('path');
-
 const pathToJson = path.join(__dirname, 'posts.json')
 
 const jsonFile = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
 
 const app = express()
+app.use(express.json())
 
 const PORT = 8000
 const HOST = 'localhost'
@@ -24,10 +25,9 @@ app.get("/timestamp", (req, res) =>{
 app.get("/posts", (req, res) =>{
     let { skip, take } = req.query
     if (take && skip){
+        
         take = +take; skip = +skip
         
-        // res.json({take: isNaN(take), skip: isNaN(skip)})
-
         if (!isNaN(take) && !isNaN(skip)){
             let sliced = jsonFile.slice(skip, skip + take)
             res.json(sliced)
@@ -47,8 +47,43 @@ app.get("/posts", (req, res) =>{
             let skipped = jsonFile.slice(skip)
             res.json(skipped)
         }
+    } else{
+        res.json(jsonFile)
     }
 })
+
+
+
+app.post('/posts', async (req, res) => {
+    let body = req.body
+    if (!body) {
+        res.status(422).json("Body is required.")
+        return
+    }
+    
+    const newPost = {id: jsonFile.length + 1, ...body}
+
+    if (!newPost.title) {
+        res.status(422).json("title is required.")
+        return
+    }
+    if (!newPost.description) {
+        res.status(422).json("description is required.")
+        return
+    }
+    if (!newPost.image) {
+        res.status(422).json("image is required.")
+        return
+    }
+    try{
+        jsonFile.push(newPost)
+        await fsp.writeFile(pathToJson, JSON.stringify(jsonFile, null, 4))
+        res.status(201).json(newPost)
+    } catch (err){
+        res.status(500).json(`Post creation error: ${err}`)
+    }
+})
+
 
 
 app.get("/posts/:id",(req, res)=>{
