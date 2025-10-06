@@ -9,7 +9,7 @@ const jsonFile = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
 const PostService = {
     async create(data){
         try{
-            const newPost = {id: jsonFile.length + 1, ...data}
+            const newPost = {...data, id: jsonFile.length + 1}
             jsonFile.push(newPost)
             await fsp.writeFile(pathToJson, JSON.stringify(jsonFile, null, 4))
             return newPost
