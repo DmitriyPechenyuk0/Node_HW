@@ -4,7 +4,13 @@ import fsp from 'fs/promises';
 
 const pathToJson = path.join(__dirname, 'posts.json')
 
-const jsonFile = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
+const jsonFile: {
+    id: number,
+    title: string,
+    description: string,
+    image: string,
+    likes?: number
+}[] = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
 
 export const PostService = {
     async create(data: {
@@ -50,13 +56,7 @@ export const PostService = {
         }
     },
     getByID(id:number){
-        const post = jsonFile.find((post:{
-            id: number,
-            title: string,
-            description: string,
-            image: string,
-            likes?: number
-        })=>{
+        const post = jsonFile.find((post)=>{
 
             const isMatch = post.id === id
             return isMatch
