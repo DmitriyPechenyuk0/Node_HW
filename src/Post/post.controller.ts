@@ -1,12 +1,18 @@
-const PostService = require('./post.service')
+import { Request, Response } from "express"
+import { PostService } from "./post.service";
 
-const PostController = {
-    getAll: (req, res) =>{
-        let { skip, take } = req.query
+export const PostController = {
+    getAll: (req: Request, res: Response) =>{
+        // let { skip, take } = req.query
+        let skip: any = req.query.skip
+        let take: any = req.query.take
         res.json(PostService.getAll(take, skip))
     },
-    getByID: (req, res)=>{
-
+    getByID: (req: Request, res: Response)=>{
+        if (!req.params.id){
+            res.status(400).json("id is required");
+            return
+        } 
         const id = +req.params.id
         console.log(id)
         if (isNaN(id)){
@@ -16,7 +22,7 @@ const PostController = {
       
         res.json(PostService.getByID(id))
     },
-    create: async (req, res) => {
+    create: async (req:Request, res:Response) => {
         let body = req.body
         if (!body) {
             res.status(422).json("Body is required.")
@@ -47,5 +53,3 @@ const PostController = {
         res.status(201).json(post)
     }
 }
-
-module.exports = PostController

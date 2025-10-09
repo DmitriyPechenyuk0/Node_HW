@@ -1,13 +1,17 @@
-const fs = require('fs');
-const fsp = require('fs/promises');
-const path = require('path');
+import fs from 'fs';
+import path from 'path';
+import fsp from 'fs/promises';
 
 const pathToJson = path.join(__dirname, 'posts.json')
 
 const jsonFile = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
 
-const PostService = {
-    async create(data){
+export const PostService = {
+    async create(data: {
+        title: string,
+        description: string,
+        image: string
+    }){
         try{
             const newPost = {...data, id: jsonFile.length + 1}
             jsonFile.push(newPost)
@@ -17,7 +21,7 @@ const PostService = {
             return `Post creation error: ${err}`
         }
     },
-    getAll(take, skip){
+    getAll(take: number, skip: number){
         if (take && skip){
             
             take = +take; skip = +skip
@@ -45,8 +49,14 @@ const PostService = {
             return jsonFile
         }
     },
-    getByID(id){
-        const post = jsonFile.find((post)=>{
+    getByID(id:number){
+        const post = jsonFile.find((post:{
+            id: number,
+            title: string,
+            description: string,
+            image: string,
+            likes?: number
+        })=>{
 
             const isMatch = post.id === id
             return isMatch
@@ -58,5 +68,3 @@ const PostService = {
     }
 
 }
-
-module.exports = PostService
