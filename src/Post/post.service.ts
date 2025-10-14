@@ -1,23 +1,14 @@
 import fs from 'fs';
 import path from 'path';
 import fsp from 'fs/promises';
+import { Post, CreatePostData, UpdatePostData, PostServiceContract } from "./post.types";
 
 const pathToJson = path.join(__dirname, 'posts.json')
 
-const jsonFile: {
-    id: number,
-    title: string,
-    description: string,
-    image: string,
-    likes?: number
-}[] = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
+const jsonFile: Post[] = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
 
-export const PostService = {
-    async create(data: {
-        title: string,
-        description: string,
-        image: string
-    }){
+export const PostService: PostServiceContract = {
+    async create(data){
         try{
             const newPost = {...data, id: jsonFile.length + 1}
             jsonFile.push(newPost)
@@ -27,7 +18,7 @@ export const PostService = {
             return `Post creation error: ${err}`
         }
     },
-    getAll(take: number, skip: number){
+    getAll(take, skip){
         if (take && skip){
             
             take = +take; skip = +skip
@@ -55,7 +46,7 @@ export const PostService = {
             return jsonFile
         }
     },
-    getByID(id:number){
+    getByID(id){
         const post = jsonFile.find((post)=>{
 
             const isMatch = post.id === id
@@ -65,6 +56,20 @@ export const PostService = {
             return null
         }
         return post
+    },
+    async update(id, data){
+        const post = this.getByID(id)
+        if (!post) {
+            return null
+        }
+        try {
+            const updatedPost = { ...post, ...data }
+            jsonFile.splice(id - 1, 1, updatedPost)
+            await fsp.writeFile(pathToJson, JSON.stringify(jsonFile, null, 4))
+            return updatedPost
+        } catch (error) {
+            console.log(error)
+            return null
+        }
     }
-
 }

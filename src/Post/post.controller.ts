@@ -1,9 +1,9 @@
 import { Request, Response } from "express"
 import { PostService } from "./post.service";
+// import { Post, CreatePostData, UpdatePostData } from "./post.types";
 
 export const PostController = {
     getAll: (req: Request, res: Response) =>{
-        // let { skip, take } = req.query
         let skip: any = req.query.skip
         let take: any = req.query.take
         res.json(PostService.getAll(take, skip))
@@ -51,5 +51,27 @@ export const PostController = {
             return
         }
         res.status(201).json(post)
-    }
+    },
+    update: async(req: Request, res: Response) => {
+        const id = req.params.id
+        if (!id){
+            res.status(400).json("id is required");
+            return
+        }
+        if (isNaN(+id)){
+            res.status(400).json("id must be an integer");
+            return;
+        }
+        const body = req.body
+        if (body.id){
+            res.status(422).json("body must not consist id");
+            return
+        }
+        const post = await PostService.update(+id, body)
+        if (!post) {
+            res.status(500).json("Post update error")
+            return
+        }
+        res.status(200).json(post)
+    }   
 }
