@@ -1,14 +1,15 @@
 import { Request, Response } from "express"
 import { PostService } from "./post.service";
+import { PostControllerContract } from "./post.types";
 // import { Post, CreatePostData, UpdatePostData } from "./post.types";
 
-export const PostController = {
-    getAll: (req: Request, res: Response) =>{
+export const PostController: PostControllerContract = {
+    getAll: (req, res) =>{
         let skip: any = req.query.skip
         let take: any = req.query.take
         res.json(PostService.getAll(take, skip))
     },
-    getByID: (req: Request, res: Response)=>{
+    getByID: (req, res)=>{
         if (!req.params.id){
             res.status(400).json("id is required");
             return
@@ -22,7 +23,7 @@ export const PostController = {
       
         res.json(PostService.getByID(id))
     },
-    create: async (req:Request, res:Response) => {
+    create: async (req, res) => {
         let body = req.body
         if (!body) {
             res.status(422).json("Body is required.")
@@ -52,7 +53,7 @@ export const PostController = {
         }
         res.status(201).json(post)
     },
-    update: async(req: Request, res: Response) => {
+    update: async(req, res) => {
         const id = req.params.id
         if (!id){
             res.status(400).json("id is required");
