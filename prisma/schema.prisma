@@ -31,9 +31,9 @@ model Tag {
 
 model TagsOnPosts {
   post       Post     @relation(fields: [postId], references: [id])
-  postId     Int // relation scalar field (used in the `@relation` attribute above)
+  postId     Int
   tag        Tag      @relation(fields: [tagId], references: [id])
-  tagId      Int // relation scalar field (used in the `@relation` attribute above)
+  tagId      Int
   assignedAt DateTime @default(now())
   assignedBy String
 
