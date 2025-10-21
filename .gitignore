@@ -4,3 +4,6 @@ package-lock.json
 npm-debug.log
 .vscode/
 .env
+/src/generated/prisma
+migrations
+data.db
