@@ -2,74 +2,122 @@ import fs from 'fs';
 import path from 'path';
 import fsp from 'fs/promises';
 import { Post, CreatePostData, UpdatePostData, PostServiceContract } from "./post.types";
+import { PrismaClient } from '../generated/prisma';
+import { title } from 'process';
 
-const pathToJson = path.join(__dirname, 'posts.json')
+// const pathToJson = path.join(__dirname, 'posts.json')
 
-const jsonFile: Post[] = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
+// const jsonFile: Post[] = JSON.parse(fs.readFileSync(pathToJson, 'utf-8'))
+const client = new PrismaClient()
 
 export const PostService: PostServiceContract = {
     async create(data){
         try{
-            const newPost = {...data, id: jsonFile.length + 1}
-            jsonFile.push(newPost)
-            await fsp.writeFile(pathToJson, JSON.stringify(jsonFile, null, 4))
+            const newPost = await client.post.create({data:
+                {
+                    title: data.title,
+                    description: data.description,
+                    image: data.image
+
+                }
+            })
             return newPost
         } catch (err){
+            client.$disconnect()
             return `Post creation error: ${err}`
         }
     },
-    getAll(take, skip){
+    getAll: async (take, skip) => {
         if (take && skip){
             
             take = +take; skip = +skip
             
             if (!isNaN(take) && !isNaN(skip)){
-                let sliced = jsonFile.slice(skip, skip + take)
-                return sliced
+                try {
+                    let sliced = await client.post.findMany({skip: skip, take: take})
+                    return sliced
+                } catch (error) {
+                    client.$disconnect()
+                    return undefined
+                }
             }
         }
         if (take){
             take = +take
             if (!isNaN(take)){
-                let taked = jsonFile.slice(0, take)
-                return taked
+                try {
+                    let taked = await client.post.findMany({take: take})
+                    return taked
+                } catch (error) {
+                    client.$disconnect()
+                    return undefined
+                }
             }
         }
         if (skip){
             skip = +skip
             
             if(!isNaN(skip)){
-                let skipped = jsonFile.slice(skip)
-                return skipped
+                try {
+                    let skipped = await client.post.findMany({skip: skip})
+                    return skipped
+                } catch (error) {
+                    client.$disconnect()
+                    return undefined
+                }
             }
         } else{
-            return jsonFile
+            try {
+                return await client.post.findMany()
+            } catch (error) {
+                client.$disconnect()
+                return undefined
+            }
         }
     },
     getByID(id){
-        const post = jsonFile.find((post)=>{
-
-            const isMatch = post.id === id
-            return isMatch
-        })
-        if (!post){
+        try {
+            const post = client.post.findUniqueOrThrow(
+                {where: {id: id}}
+            )
+            return post
+            
+        } catch (error) {
+            client.$disconnect()
             return null
         }
-        return post
     },
     async update(id, data){
-        const post = this.getByID(id)
-        if (!post) {
-            return null
-        }
         try {
-            const updatedPost = { ...post, ...data }
-            jsonFile.splice(id - 1, 1, updatedPost)
-            await fsp.writeFile(pathToJson, JSON.stringify(jsonFile, null, 4))
+            let updateData: UpdatePostData = {};
+            if (data.title !== undefined) updateData.title = data.title;
+            if (data.description !== undefined) updateData.description = data.description;
+            if (data.image !== undefined) updateData.image = data.image;
+
+            let updatedPost = await client.post.update({
+                where: {
+                    id: id
+                },
+                data: updateData
+            })
+
             return updatedPost
         } catch (error) {
+            client.$disconnect()
             console.log(error)
             return null
         }
-    }
+    },
+    async delete(id) {
+        try {
+            client.post.delete({
+                where: {
+                    id: id
+                }
+            })
+        } catch (error) {
+            client.$disconnect()
+            return null
+        }
+    },
 }

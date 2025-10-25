@@ -1,6 +1,7 @@
 import { Request, Response } from "express"
 import { PostService } from "./post.service";
 import { PostControllerContract } from "./post.types";
+import { idText } from "typescript";
 // import { Post, CreatePostData, UpdatePostData } from "./post.types";
 
 export const PostController: PostControllerContract = {
@@ -45,7 +46,7 @@ export const PostController: PostControllerContract = {
         }
 
         
-
+        
         const post = await PostService.create(body)
         if (!post) {
             res.status(500).json("Product creation error")
@@ -74,5 +75,15 @@ export const PostController: PostControllerContract = {
             return
         }
         res.status(200).json(post)
-    }   
+    },
+    delete: async (req, res) => {
+        try {
+            let iid = Number(req.params.id)
+            if (iid){
+                res.json(await PostService.delete(iid))
+            }
+        } catch (error) {
+            res.json('Error while trying delete post')
+        }
+    },
 }
