@@ -1,8 +1,6 @@
 import { Request, Response } from "express"
 import { PostService } from "./post.service";
 import { PostControllerContract } from "./post.types";
-import { idText } from "typescript";
-// import { Post, CreatePostData, UpdatePostData } from "./post.types";
 
 export const PostController: PostControllerContract = {
     getAll: (req, res) =>{
