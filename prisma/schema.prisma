@@ -14,6 +14,17 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model User {
+  id           Int        @id @default(autoincrement())
+  firstName    String
+  secondName   String
+  email        String     @unique
+  avatar       String     @unique
+  isAdmin      Boolean    @default(false)
+  createdPosts Post[]
+  likedPosts   PostLike[]
+}
+
 model Post {
   id          Int           @id @default(autoincrement())
   title       String
@@ -21,6 +32,18 @@ model Post {
   image       String?
   likes       Int?
   tags        TagsOnPosts[]
+  createdBy   User          @relation(fields: [createdById], references: [id])
+  createdById Int
+  likedBy     PostLike[]
+}
+
+model PostLike {
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+  post   Post @relation(fields: [postId], references: [id])
+  postId Int
+
+  @@id([userId, postId])
 }
 
 model Tag {

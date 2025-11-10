@@ -1,4 +1,3 @@
-import { Request, Response } from "express"
 import { TagService } from "./tag.service";
 import { TagControllerContract } from "./tag.types";
 

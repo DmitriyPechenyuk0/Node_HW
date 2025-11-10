@@ -1,7 +1,5 @@
-import { PrismaClient } from '../generated/prisma';
+import { client } from '../config/client';
 import { PostRepositoryContract } from './post.types';
-
-const client = new PrismaClient()
 
 export const PostRepo: PostRepositoryContract = {
     async getAll(take, skip) {
@@ -49,11 +47,17 @@ export const PostRepo: PostRepositoryContract = {
     },
     async create(data) {
         try{
+            const userID = 1
             const newPost = await client.post.create({data:
                 {
                     title: data.title,
                     description: data.description,
-                    image: data.image
+                    image: data.image,
+                    createdBy: {
+                        connect: {
+                            id: userID
+                        }
+                    }
 
                 }
             })

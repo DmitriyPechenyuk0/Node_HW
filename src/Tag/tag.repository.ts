@@ -1,7 +1,5 @@
-import { PrismaClient } from '../generated/prisma';
+import { client } from '../config/client';
 import { TagRepositoryContract } from './tag.types';
-
-const client = new PrismaClient()
 
 export const TagRepo: TagRepositoryContract = {
     async getAll(take, skip) {
