@@ -1,8 +1,35 @@
 import { UserServiceContract } from './user.types'
 import { UserRepository } from './user.repository'
+import { sign, verify } from 'jsonwebtoken'
+import { env } from '../config/env'
 
 export const userService: UserServiceContract = {
-    async login(email){
-        return UserRepository.login(email)
+    async login(email, password){
+        const user = await UserRepository.login(email, password)
+
+        if (!user){
+            return "not found"
+        } else{
+            return sign({userId: user.id}, env.SECRET_KEY, {expiresIn: '7d'})
+        }
+    },
+    async register(body){
+        const user = await UserRepository.register(body)
+        if (typeof user === "number"){
+            return sign({userId: user}, env.SECRET_KEY, {expiresIn: '7d'})
+        }
+        return user
+    },
+    async me(token){
+        try {
+            const decoded = verify(token, env.SECRET_KEY)
+
+            if (typeof decoded === 'object'){
+                return await UserRepository.me(decoded.userId)
+            }
+        } catch (error) {
+            console.log(error)
+            return 'error'
+        }
     }
 }

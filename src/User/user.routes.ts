@@ -3,9 +3,9 @@ import { UserController } from './user.controller'
 
 const UserRouter: express.Router = express.Router()
 
-UserRouter.get("/login", UserController.login)
-// UserRouter.get("/register", UserController.register)
-// UserRouter.get("/me", UserController.register)
+UserRouter.post("/login", UserController.login)
+UserRouter.post("/register", UserController.register)
+UserRouter.get("/me", UserController.me)
 
 
 export { UserRouter }

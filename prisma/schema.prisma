@@ -20,6 +20,7 @@ model User {
   secondName   String
   email        String     @unique
   avatar       String     @unique
+  password     String     @unique
   isAdmin      Boolean    @default(false)
   createdPosts Post[]
   likedPosts   PostLike[]
