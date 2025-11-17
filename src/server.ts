@@ -4,9 +4,12 @@ import { PostRouter } from './Post/post.routes'
 import { TagRouter } from './Tag/tag.routes'
 import { UserRouter } from './User/user.routes'
 
+import { logMiddleware } from './middlewares/log.middleware'
+
 
 const app: express.Express = express()
 app.use(express.json())
+app.use(logMiddleware)
 app.use(PostRouter)
 app.use(TagRouter)
 app.use(UserRouter)

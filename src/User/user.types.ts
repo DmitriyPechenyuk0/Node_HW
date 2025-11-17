@@ -20,7 +20,7 @@ export interface UserRepositoryContract {
 export interface UserServiceContract {
     login: (email: string, password: string) => Promise<string>;
     register: (body: ForReg) => Promise<string>;
-    me: (token: string) => Promise<UserWithoutPassword | string | null | undefined > 
+    me: (userId: number) => Promise<UserWithoutPassword | string | null | undefined > 
 }
 // Request<P, ResBody, ReqBody, ReqQuery, Locals>
 // P - динамічний параметри (req.params)

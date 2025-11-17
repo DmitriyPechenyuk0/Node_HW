@@ -15,18 +15,18 @@ export const userService: UserServiceContract = {
     },
     async register(body){
         const user = await UserRepository.register(body)
+
+        if (user){
+            throw new Error("USER_EXISTS")
+        }
         if (typeof user === "number"){
             return sign({userId: user}, env.SECRET_KEY, {expiresIn: '7d'})
         }
         return user
     },
-    async me(token){
+    async me(userId){
         try {
-            const decoded = verify(token, env.SECRET_KEY)
-
-            if (typeof decoded === 'object'){
-                return await UserRepository.me(decoded.userId)
-            }
+            return await UserRepository.me(userId)
         } catch (error) {
             console.log(error)
             return 'error'

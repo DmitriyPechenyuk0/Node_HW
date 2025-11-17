@@ -39,11 +39,11 @@ export const UserRepository: UserRepositoryContract = {
             throw error
         }
     },
-    async me(id) {
+    async me(userId) {
         try {
             return await client.user.findUnique({
                 where: {
-                    id: id
+                    id: userId
                 }, 
                 omit: {
                     password: true

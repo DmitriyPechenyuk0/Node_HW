@@ -55,29 +55,20 @@ export const UserController: UserControllerContract = {
             return
         }
         const JWTOrAlready = await userService.register(body)
+        let status = 0
 
-        if (JWTOrAlready == 'Same user already registered'){
-            res.status(404).json('Same user already registered')
-            return
-        } else{
-            res.status(201).json(JWTOrAlready)
-            return
+        switch (JWTOrAlready) {
+            case 'Same user already registered':
+                status = 404
+            default:
+                status = 201
         }
+        
+        res.status(status).json(JWTOrAlready)
+        
     },
     me: async (req, res) => {
-
-        const authHeader = req.headers.authorization;
-        
-        if (!authHeader) {
-            res.status(401).json('No token')
-            return
-        }
-        const token = authHeader.split(' ')[1]
-        if (!token) {
-            res.status(401).json('No token')
-            return
-        }
-        const user = await userService.me(token)
+        const user = await userService.me(res.locals.userId)
         if (user){
             res.status(200).json(user)
         }
